@@ -17,7 +17,14 @@
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-star-prnt` and add `RNStarPrnt.xcodeproj`
 3. In XCode, in the project navigator, select your project. Add `libRNStarPrnt.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Run your project (`Cmd+R`)<
+4. Add $(PROJECT_DIR)/../node_modules/react-native-star-prnt/ios/Frameworks to Framework search paths
+
+for Bluetooth printers:
+
+1. Click on the information property list file (default : “Info.plist”).
+2. Add the “Supported external accessory protocols” Key.
+3. Click the triangle of this key and set the value for the “Item 0” to “jp.star-m.starpro”.
+
 
 #### Android
 

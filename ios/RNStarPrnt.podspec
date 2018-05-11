@@ -17,8 +17,8 @@ Pod::Spec.new do |s|
 
 
   s.dependency "React"
-  s.vendored_frameworks = 'ios/StarSDK/StarIO.framework'
-  s.vendored_frameworks = 'ios/StarSDK/StarIO_Extension.framework'
+  s.vendored_frameworks = 'StarIO.framework'
+  s.vendored_frameworks = 'StarIO_Extension.framework'
 
   #s.dependency "others"
 

@@ -11,5 +11,7 @@
 
 @interface RNStarPrnt : NSObject <RCTBridgeModule>
 
+@property (nonatomic) StarIoExtManager *printerManager;
+
 @end
   
