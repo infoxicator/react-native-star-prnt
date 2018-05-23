@@ -27,10 +27,12 @@ export class StarPRNT {
      * Allows you to connect to the printer, keep the connection alive and receive status updates through an observable
      * @param {string} port printer name i.e BT:StarMicronics.
      * @param {string} emulation StarPrinter Emulation type: "StarPRNT", "StarPRNTL", "StarLine", "StarGraphic", "EscPos", "EscPosMobile", "StarDotImpact"
+     * @param {boolean} hasBarcodeReader  optional. If device has an attached barcode reader i.e mPOP
      * @return {Observable<any>} Success! if connected or error message string returned by the SDK.
      */
-    static connect(port: string, emulation: string) { 
-        return RNStarPrnt.connect(port, emulation);        
+    static connect(port: string, emulation: string, hasBarcodeReader: boolean) {
+        hasBarcodeReader = (hasBarcodeReader) ? true : false; 
+        return RNStarPrnt.connect(port, emulation, hasBarcodeReader);        
        }
  
      /**

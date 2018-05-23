@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package net.infoxication.reactstarprnt;
 
 import java.util.Arrays;
 import java.util.Collections;
