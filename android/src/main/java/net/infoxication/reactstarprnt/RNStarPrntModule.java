@@ -6,10 +6,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 
 import com.facebook.common.util.ExceptionWithNoStacktrace;
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.starmicronics.stario.PortInfo;
 import com.starmicronics.stario.StarIOPort;
 import com.starmicronics.stario.StarIOPortException;
@@ -153,7 +156,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
       starIoExtManager.disconnect(null);
     }
     starIoExtManager = new StarIoExtManager(hasBarcodeReader ? StarIoExtManager.Type.WithBarcodeReader : StarIoExtManager.Type.Standard, portName, portSettings, 10000, context);
-    //starIoExtManager.setListener(starIoExtManagerListener);
+    starIoExtManager.setListener(starIoExtManagerListener);
 
     new Thread(new Runnable() {
       public void run() {
@@ -194,7 +197,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
             @Override
             public void onDisconnected() {
               //sendEvent("printerOffline", null);
-              //starIoExtManager.setListener(null); //remove the listener?
+              starIoExtManager.setListener(null); //remove the listener?
               promise.resolve("Printer Disconnected");
             }
           });
@@ -767,6 +770,94 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
         }
         else if (encoding.equals("UTF-8")) return Charset.forName("UTF-8"); // UTF-8
         else return Charset.forName("US-ASCII");
-    }
+    };
+
+    private void sendEvent(String dataType, String info) {
+        ReactContext reactContext = getReactApplicationContext();
+        String eventName = "starPrntData";
+        WritableMap params = new WritableNativeMap();
+        params.putString("dataType", dataType);
+        if (info != null) params.putString("data", info);
+        reactContext
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    };
+
+
+    private StarIoExtManagerListener starIoExtManagerListener = new StarIoExtManagerListener() {
+        @Override
+        public void onPrinterImpossible() {
+            sendEvent("printerImpossible", null);
+        }
+
+        @Override
+        public void onPrinterOnline() {
+            sendEvent("printerOnline", null);
+        }
+
+        @Override
+        public void onPrinterOffline() {
+            sendEvent("printerOffline", null);
+        }
+
+        @Override
+        public void onPrinterPaperReady() {
+            sendEvent("printerPaperReady", null);
+        }
+
+        @Override
+        public void onPrinterPaperNearEmpty() {
+            sendEvent("printerPaperNearEmpty", null);
+        }
+
+        @Override
+        public void onPrinterPaperEmpty() {
+            sendEvent("printerPaperEmpty", null);
+        }
+
+        @Override
+        public void onPrinterCoverOpen() {
+            sendEvent("printerCoverOpen", null);
+        }
+
+        @Override
+        public void onPrinterCoverClose() {
+            sendEvent("printerCoverClose", null);
+        }
+
+        //Cash Drawer events
+        @Override
+        public void onCashDrawerOpen() {
+            sendEvent("cashDrawerOpen", null);
+        }
+
+        @Override
+        public void onCashDrawerClose() {
+            sendEvent("cashDrawerClose", null);
+        }
+
+        @Override
+        public void onBarcodeReaderImpossible() {
+            sendEvent("barcodeReaderImpossible", null);
+        }
+
+        @Override
+        public void onBarcodeReaderConnect() {
+            sendEvent("barcodeReaderConnect", null);
+        }
+
+        @Override
+        public void onBarcodeReaderDisconnect() {
+            sendEvent("barcodeReaderDisconnect", null);
+        }
+
+        @Override
+        public void onBarcodeDataReceive(byte[] data) {
+            sendEvent("barcodeDataReceive", new String(data));
+        }
+
+    };
+
+
 
 }

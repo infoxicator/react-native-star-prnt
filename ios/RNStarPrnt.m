@@ -14,11 +14,31 @@
 
 @implementation RNStarPrnt
 
+ bool hasListeners;
+
 - (dispatch_queue_t)methodQueue
 {
     return dispatch_queue_create("net.infoxication.react.starprnt", DISPATCH_QUEUE_SERIAL);
 }
 RCT_EXPORT_MODULE();
+
+- (NSArray<NSString *> *)supportedEvents
+{
+    return @[@"starPrntData"];
+}
+
+// Will be called when this module's first listener is added.
+-(void)startObserving {
+    hasListeners = YES;
+    // Set up any upstream listeners or background tasks as necessary
+}
+
+// Will be called when this module's last listener is removed, or on dealloc.
+-(void)stopObserving {
+    hasListeners = NO;
+    // Remove upstream listeners, stop unnecessary background tasks
+}
+
 
 RCT_REMAP_METHOD(portDiscovery, portType:(NSString *)portType
                  findPrintersWithResolver:(RCTPromiseResolveBlock)resolve
@@ -105,6 +125,7 @@ RCT_REMAP_METHOD(checkStatus, portName:(NSString *)portName
 }
 RCT_REMAP_METHOD(connect, portName:(NSString *)portName
                  emulation:(NSString *)emulation
+                 hasBarcodeReader:(nonnull NSNumber *)hasBarcodeReader
                  connectWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -112,11 +133,17 @@ RCT_REMAP_METHOD(connect, portName:(NSString *)portName
         NSString *portSettings = [self getPortSettingsOption:emulation];
     
         if (portName != nil && portName != (id)[NSNull null]){
-            _printerManager = [[StarIoExtManager alloc] initWithType:StarIoExtManagerTypeStandard
-                                                              portName:portName
-                                                          portSettings:portSettings
-                                                       ioTimeoutMillis:10000];
-            
+            if ([hasBarcodeReader isEqual:@(YES)]) {
+                _printerManager = [[StarIoExtManager alloc] initWithType:StarIoExtManagerTypeWithBarcodeReader
+                                                                portName:portName
+                                                            portSettings:portSettings
+                                                         ioTimeoutMillis:10000];
+            } else {
+                _printerManager = [[StarIoExtManager alloc] initWithType:StarIoExtManagerTypeStandard
+                                                                portName:portName
+                                                            portSettings:portSettings
+                                                         ioTimeoutMillis:10000];
+            }
             _printerManager.delegate = self;
         }
     
@@ -243,6 +270,91 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
         
     }
     
+}
+#pragma mark -
+#pragma mark Printer Events
+#pragma mark -
+-(void)didPrinterCoverOpen {
+        [self sendData:@"printerCoverOpen" data:nil];
+}
+
+-(void)didPrinterCoverClose {
+        [self sendData:@"printerCoverClose" data:nil];
+}
+
+-(void)didPrinterImpossible {
+        [self sendData:@"printerImpossible" data:nil];
+}
+
+-(void)didPrinterOnline {
+        [self sendData:@"printerOnline" data:nil];
+}
+
+-(void)didPrinterOffline {
+        [self sendData:@"printerOffline" data:nil];
+}
+
+-(void)didPrinterPaperEmpty {
+        [self sendData:@"printerPaperEmpty" data:nil];
+}
+
+-(void)didPrinterPaperNearEmpty {
+        [self sendData:@"printerPaperNearEmpty" data:nil];
+}
+
+-(void)didPrinterPaperReady {
+        [self sendData:@"printerPaperReady" data:nil];
+}
+
+#pragma mark -
+#pragma mark Cash drawer events
+#pragma mark -
+
+-(void)didCashDrawerOpen {
+        [self sendData:@"cashDrawerOpen" data:nil];
+}
+-(void)didCashDrawerClose {
+        [self sendData:@"cashDrawerClose" data:nil];
+}
+
+
+-(void)didBarcodeReaderImpossible {
+        [self sendData:@"barcodeReaderImpossible" data:nil];
+}
+
+-(void)didBarcodeReaderConnect {
+        [self sendData:@"barcodeReaderConnect" data:nil];
+}
+
+-(void)didBarcodeReaderDisconnect {
+        [self sendData:@"barcodeReaderDisconnect" data:nil];
+}
+
+- (void)didBarcodeDataReceive:(NSData *)data {
+        NSMutableString *text = [NSMutableString stringWithString:@""];
+        const uint8_t *p = [data bytes];
+        for (int i = 0; i < data.length; i++) {
+            uint8_t ch = *(p + i);
+            if(ch >= 0x20 && ch <= 0x7f) {
+                [text appendFormat:@"%c", (char) ch];
+            }
+            else if (ch == 0x0d) {
+                // text = [NSMutableString stringWithString:@""];
+            }
+        }
+        [self sendData:@"barcodeDataReceive" data:text];
+}
+
+- (void)sendData:(NSString *)dataType data:(NSString *)data {
+    
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        [dict setObject:dataType forKey:@"dataType"];
+        if (data != nil) {
+            [dict setObject:data forKey:@"data"];
+        }
+     if (hasListeners) {
+         [self sendEventWithName:@"starPrntData" body:dict];
+     }
 }
 
 
