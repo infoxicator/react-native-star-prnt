@@ -211,7 +211,7 @@ export class StarPRNT {
      * @param {string} type Iterface Type: All, LAN, Bluetooth, USB
      * @return {Promise<Printers>} Returns a promise that resolves with an array of printers
      */
-    static portDiscovery(type:string) {
+    static portDiscovery(type) {
         return RNStarPrnt.portDiscovery(type);
     }
 
@@ -221,7 +221,7 @@ export class StarPRNT {
      * @param {string} emulation StarPrinter Emulation type: "StarPRNT", "StarPRNTL", "StarLine", "StarGraphic", "EscPos", "EscPosMobile", "StarDotImpact"
      * @return {Promise<PrinterStatus>} Returns a promise that resolves with the printer status object
      */
-    static checkStatus(port: string, emulation:string){
+    static checkStatus(port, emulation){
         return RNStarPrnt.checkStatus(port, emulation);
     }
     /**
@@ -231,7 +231,7 @@ export class StarPRNT {
      * @param {boolean} hasBarcodeReader If device has an attached barcode reader i.e mPOP
      * @return {Observable<any>} Success! if connected or error message string returned by the SDK.
      */
-    static connect(port: string, emulation: string, hasBarcodeReader: boolean) {
+    static connect(port, emulation, hasBarcodeReader) {
         hasBarcodeReader = (hasBarcodeReader) ? true : false; 
         return RNStarPrnt.connect(port, emulation, hasBarcodeReader);        
        }
@@ -252,7 +252,7 @@ export class StarPRNT {
      * * @param {string} port Optional. printer name i.e BT:StarMicronics. If not set, a printer connected via StarIOExtManager using the connect() function will be used.
      * @return {Promise<any>} Success! if printed correctly or error message string returned by the SDK.
      */
-    static print(emulation: string, commandsArray: CommandsArray, port: string) { 
+    static print(emulation, commandsArray, port) { 
         return RNStarPrnt.print(port, emulation, commandsArray); 
     }
 

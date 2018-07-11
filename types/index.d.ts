@@ -1,3 +1,248 @@
+import { NativeEventEmitter } from 'react-native';
+
+declare class StarPRNT {
+
+    static StarPRNTManagerEmitter: NativeEventEmitter;
+
+    /**
+    * Constant for Emulation
+    */
+    static Emulation: {
+        StarPRNT: string,
+        StarPRNTL: string,
+        StarLine: string,
+        StarGraphic: string,
+        EscPos: string,
+        EscPosMobile: string,
+        StarDotImpact: string,
+    };
+
+    /**
+     * Constant for possible Encoding
+     */
+    static Encoding: {
+        USASCII: string,
+        Windows1252: string,
+        ShiftJIS: string,
+        Windows1251: string,
+        GB2312: string,
+        Big5: string,
+        UTF8: string
+    };
+
+    /**
+     * CodePageType constants
+     */
+    static CodePageType: {
+        CP737: string,
+        CP772: string,
+        CP774: string,
+        CP851: string,
+        CP852: string,
+        CP855: string,
+        CP857: string,
+        CP858: string,
+        CP860: string,
+        CP861: string,
+        CP862: string,
+        CP863: string,
+        CP864: string,
+        CP865: string,
+        CP869: string,
+        CP874: string,
+        CP928: string,
+        CP932: string,
+        CP999: string,
+        CP1001: string,
+        CP1250: string,
+        CP1251: string,
+        CP1252: string,
+        CP2001: string,
+        CP3001: string,
+        CP3002: string,
+        CP3011: string,
+        CP3012: string,
+        CP3021: string,
+        CP3041: string,
+        CP3840: string,
+        CP3841: string,
+        CP3843: string,
+        CP3845: string,
+        CP3846: string,
+        CP3847: string,
+        CP3848: string,
+        UTF8: string,
+        Blank: string
+    };
+
+    /**
+     * Constant for possible InternationalType
+     */
+    static InternationalType: {
+        UK: string,
+        USA: string,
+        France: string,
+        Germany: string,
+        Denmark: string,
+        Sweden: string,
+        Italy: string,
+        Spain: string,
+        Japan: string,
+        Norway: string,
+        Denmark2: string,
+        Spain2: string,
+        LatinAmerica: string,
+        Korea: string,
+        Ireland: string,
+        Legal: string
+    };
+
+    /**
+     * Constant for possible FontStyleType
+     */
+    static FontStyleType: {
+        /** Font-A (12 x 24 dots) / Specify 7 x 9 font (half dots) */
+        A: string,
+        /** Font-B (9 x 24 dots) / Specify 5 x 9 font (2P-1) */
+        B: string
+    };
+
+    /**
+     * Constant for possible CutPaperAction
+     */
+    static CutPaperAction: {
+        FullCut: string,
+        FullCutWithFeed: string,
+        PartialCut: string,
+        PartialCutWithFeed: string
+    };
+
+    /**
+     * Constant for possible BlackMarkType
+     */
+    static BlackMarkType: {
+        Valid: string,
+        Invalid: string,
+        ValidWithDetection: string
+    };
+
+    /**
+     * Constant for possible AlignmentPosition
+     */
+    static AlignmentPosition: {
+        Left: string,
+        Center: string,
+        Right: string
+    };
+
+    /**
+     * Constant for possible LogoSize
+     */
+    static LogoSize: {
+        Normal: string,
+        DoubleWidth: string,
+        DoubleHeight: string,
+        DoubleWidthDoubleHeight: string
+    };
+
+    /**
+     * Constant for possible BarcodeSymbology
+     */
+    static BarcodeSymbology: {
+        Code128: string,
+        Code39: string,
+        Code93: string,
+        ITF: string,
+        JAN8: string,
+        JAN13: string,
+        NW7: string,
+        UPCA: string,
+        UPCE: string
+    };
+
+    /**
+     * Constant for possible BarcodeWidth
+     */
+    static BarcodeWidth: {
+        Mode1: string,
+        Mode2: string,
+        Mode3: string,
+        Mode4: string,
+        Mode5: string,
+        Mode6: string,
+        Mode7: string,
+        Mode8: string,
+        Mode9: string
+    };
+
+    /**
+     * Constant for possible QrCodeModel
+     */
+    static QrCodeModel: {
+        No1: string,
+        No2: string
+    };
+
+    /**
+     * Constant for possible QrCodeLevel
+     */
+    static QrCodeLevel: {
+        H: string,
+        L: string,
+        M: string,
+        Q: string
+    };
+
+    /**
+     * Constant for possible BitmapConverterRotation
+     */
+    static BitmapConverterRotation: {
+        Normal: string,
+        Left90: string,
+        Right90: string,
+        Rotate180: string
+    };
+
+    /**
+     * Find printers available
+     * @param {string} type Iterface Type: All, LAN, Bluetooth, USB
+     * @return {Promise<Printers>} Returns a promise that resolves with an array of printers
+     */
+    static portDiscovery: (type: string) => Promise<Printers>;
+
+    /**
+     * Checks the status of the printer 
+     * @param {string} port printer name i.e BT:StarMicronics
+     * @param {string} emulation StarPrinter Emulation type: "StarPRNT", "StarPRNTL", "StarLine", "StarGraphic", "EscPos", "EscPosMobile", "StarDotImpact"
+     * @return {Promise<PrinterStatus>} Returns a promise that resolves with the printer status object
+     */
+    static checkStatus: (port: string, emulation: string) => Promise<PrinterStatus>;
+
+    /**
+     * Allows you to connect to the printer, keep the connection alive and receive status updates through an observable
+     * @param {string} port printer name i.e BT:StarMicronics.
+     * @param {string} emulation StarPrinter Emulation type: "StarPRNT", "StarPRNTL", "StarLine", "StarGraphic", "EscPos", "EscPosMobile", "StarDotImpact"
+     * @param {boolean} hasBarcodeReader If device has an attached barcode reader i.e mPOP
+     * @return {Promise<any>} Success! if connected or error message string returned by the SDK.
+     */
+    static connect: (port: string, emulation: string, hasBarcodeReader: boolean) => Promise<any>;
+ 
+     /**
+      * Allows to disconnect (close the connection to the peripherals), this is useful to avoid keeping alive a connection when not in the app to save device battery 
+      * (energy consumption). You should call this function when the app is paused or closed.
+      * @return {Promise<any>} Success! if connected or error message string returned by the SDK.
+      */
+     static disconnect: () => Promise<any>;
+
+      /**
+     * Sends an Array of commands to the command buffer using the Android ICommandBuilderInterface or iOS ISCBBuilderInterface
+     * @param {string} emulation  StarPrinter Emulation type: "StarPRNT", "StarPRNTL", "StarLine", "StarGraphic", "EscPos", "EscPosMobile", "StarDotImpact"
+     * @param {CommandsArray} commandsArray  each command in the array should be an instance of the PrintCommand object. Example [{append:"text"}, {"openCashDrawer: 1"}]
+     * * @param {string} port Optional. printer name i.e BT:StarMicronics. If not set, a printer connected via StarIOExtManager using the connect() function will be used.
+     * @return {Promise<any>} Success! if printed correctly or error message string returned by the SDK.
+     */
+    static print: (emulation: string, commandsArray: CommandsArray, port?: string) => Promise<any>;
+}
 
 export interface Printer {
     /**
