@@ -552,7 +552,7 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
             UIFont *font = [UIFont fontWithName:fontName size:fontSize * 2];
             UIImage *image = [self imageWithString:text font:font width:width];
 
-            [builder appendBitmap:image diffusion:NO width:width bothScale:YES];
+            [builder appendBitmap:image diffusion:NO];
         }
     }
     
