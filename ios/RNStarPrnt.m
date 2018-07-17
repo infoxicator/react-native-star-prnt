@@ -522,7 +522,7 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
             }
             else [builder appendQrCodeData:[[command valueForKey:@"appendQrCode"] dataUsingEncoding:encoding]
                                      model:qrCodeModel level:qrCodeLevel cell:cell];
-            }
+        }
         else if ([command valueForKey:@"appendBitmap"]) {
             NSString *urlString = [command valueForKey:@"appendBitmap"];
             NSInteger width = ([command valueForKey:@"width"]) ? [[command valueForKey:@"width"] intValue] : 576;
@@ -543,7 +543,17 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
             }
             else [builder appendBitmap:image diffusion:diffusion width:width bothScale:bothScale rotation:rotation];
         }
-        
+        else if ([command valueForKey:@"appendBitmapText"]) {
+            NSString *text = [command valueForKey:@"appendBitmapText"];
+            NSInteger width = ([command valueForKey:@"width"]) ? [[command valueForKey:@"width"] intValue] : 576;
+            NSString *fontName = ([command valueForKey:@"font"]) ? [command valueForKey:@"font"] : @"Menlo";
+            NSInteger fontSize = ([command valueForKey:@"fontSize"]) ? [[command valueForKey:@"fontSize"] intValue] : 12;
+
+            UIFont *font = [UIFont fontWithName:fontName size:fontSize * 2];
+            UIImage *image = [self imageWithString:text font:font width:width];
+
+            [builder appendBitmap:image diffusion:NO];
+        }
     }
     
 }
@@ -759,6 +769,46 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
               @"StarPRNTL" : @(StarIoExtEmulationStarPRNTL),
               @"StarLine" : @(StarIoExtEmulationStarLine)};
 };
+
+- (UIImage *)imageWithString:(NSString *)string font:(UIFont *)font width:(CGFloat)width {
+    NSDictionary *attributeDic = @{NSFontAttributeName:font};
+    
+    CGSize size = [string boundingRectWithSize:CGSizeMake(width, 10000)
+                                       options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingTruncatesLastVisibleLine
+                                    attributes:attributeDic
+                                       context:nil].size;
+    
+    if ([UIScreen.mainScreen respondsToSelector:@selector(scale)]) {
+        if (UIScreen.mainScreen.scale == 2.0) {
+            UIGraphicsBeginImageContextWithOptions(size, NO, 1.0);
+        } else {
+            UIGraphicsBeginImageContext(size);
+        }
+    } else {
+        UIGraphicsBeginImageContext(size);
+    }
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    [[UIColor whiteColor] set];
+    
+    CGRect rect = CGRectMake(0, 0, size.width + 1, size.height + 1);
+    
+    CGContextFillRect(context, rect);
+    
+    NSDictionary *attributes = @ {
+        NSForegroundColorAttributeName:[UIColor blackColor],
+                   NSFontAttributeName:font
+    };
+    
+    [string drawInRect:rect withAttributes:attributes];
+    
+    UIImage *imageToPrint = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return imageToPrint;
+}
 
 @end
 
