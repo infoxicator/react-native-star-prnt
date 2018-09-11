@@ -14,7 +14,7 @@
 
 @implementation RNStarPrnt
 
- bool hasListeners;
+ bool RNStarPrnt_hasListeners;
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -34,13 +34,13 @@ RCT_EXPORT_MODULE();
 
 // Will be called when this module's first listener is added.
 -(void)startObserving {
-    hasListeners = YES;
+    RNStarPrnt_hasListeners = YES;
     // Set up any upstream listeners or background tasks as necessary
 }
 
 // Will be called when this module's last listener is removed, or on dealloc.
 -(void)stopObserving {
-    hasListeners = NO;
+    RNStarPrnt_hasListeners = NO;
     // Remove upstream listeners, stop unnecessary background tasks
 }
 
@@ -357,7 +357,7 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
         if (data != nil) {
             [dict setObject:data forKey:@"data"];
         }
-     if (hasListeners) {
+     if (RNStarPrnt_hasListeners) {
          [self sendEventWithName:@"starPrntData" body:dict];
      }
 }
