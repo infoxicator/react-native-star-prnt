@@ -16,6 +16,11 @@
 
  bool hasListeners;
 
++ (BOOL)requiresMainQueueSetup
+{
+    return YES;
+}
+
 - (dispatch_queue_t)methodQueue
 {
     return dispatch_queue_create("net.infoxication.react.starprnt", DISPATCH_QUEUE_SERIAL);
