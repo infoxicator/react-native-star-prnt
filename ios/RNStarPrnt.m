@@ -208,7 +208,7 @@ RCT_REMAP_METHOD(disconnect,
 RCT_REMAP_METHOD(optimisticPrint, portName:(NSString *)portName
                  emulation:(NSString *)emulation
                  printCommands:(NSArray *) printCommands
-                 sendPrintCommandWithResolver:(RCTPromiseResolveBlock)resolve
+                 sendOptimisticPrintCommandWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSString *portSettings = [self getPortSettingsOption:emulation];
