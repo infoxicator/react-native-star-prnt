@@ -204,6 +204,80 @@ RCT_REMAP_METHOD(disconnect,
     }
 }
 
+
+RCT_REMAP_METHOD(optimisticPrint, portName:(NSString *)portName
+                 emulation:(NSString *)emulation
+                 printCommands:(NSArray *) printCommands
+                 sendPrintCommandWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSString *portSettings = [self getPortSettingsOption:emulation];
+    
+    StarIoExtEmulation Emulation = [self getEmulation:emulation];
+    
+    ISCBBuilder *builder = [StarIoExt createCommandBuilder:Emulation];
+    
+    [builder beginDocument];
+    
+     [self appendCommands:builder
+               printCommands:printCommands];
+
+        [builder endDocument];
+    
+    [builder endDocument];
+    
+    if(portName != nil && portName != (id)[NSNull null]){
+    
+    [Communication sendCommandsDoNotCheckCondition:[builder.commands copy]
+                       portName:portName
+                   portSettings:portSettings
+                        timeout:10000
+              completionHandler:^(BOOL result, NSString *title, NSString *message) {
+                  if(result == YES){
+                      NSMutableDictionary *resultMessage = [[NSMutableDictionary alloc] init];
+                      [resultMessage setObject:[NSNumber numberWithBool:result == SM_TRUE] forKey:@"result"];
+                      [resultMessage setObject:title forKey:@"title"];
+                      [resultMessage setObject:message forKey:@"message"];
+                      
+                      resolve(resultMessage);
+                  }else{
+                      NSDictionary *userInfo = @{
+                                                 NSLocalizedDescriptionKey: NSLocalizedString(title, nil),
+                                                 NSLocalizedFailureReasonErrorKey: NSLocalizedString(message, nil),
+                                                 NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(@"Check the printer is online and connected to the device", nil)
+                                                 };
+                      NSError *error = [[NSError alloc] initWithDomain:@"StarPrntErrorDomain"
+                                                                  code:-1 userInfo:userInfo];
+                      reject(title, message, error);
+                  }
+              }];
+    }else{ //Use StarIOExtManager and send command to connected printer
+        [Communication sendCommandsDoNotCheckCondition:[builder.commands copy]
+                           port:_printerManager.port
+                  completionHandler:^(BOOL result, NSString *title, NSString *message) {
+                      if(result == YES){
+                          NSMutableDictionary *resultMessage = [[NSMutableDictionary alloc] init];
+                          [resultMessage setObject:[NSNumber numberWithBool:result == SM_TRUE] forKey:@"result"];
+                          [resultMessage setObject:title forKey:@"title"];
+                          [resultMessage setObject:message forKey:@"message"];
+                          
+                          resolve(resultMessage);
+                      }else{
+                          NSDictionary *userInfo = @{
+                                                     NSLocalizedDescriptionKey: NSLocalizedString(title, nil),
+                                                     NSLocalizedFailureReasonErrorKey: NSLocalizedString(message, nil),
+                                                     NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(@"Check the printer is online and connected to the device", nil)
+                                                     };
+                          NSError *error = [[NSError alloc] initWithDomain:@"StarPrntErrorDomain"
+                                                                      code:-1 userInfo:userInfo];
+                          reject(title, message, error);
+                      }
+                  }];
+        
+    }
+    
+}
+
 RCT_REMAP_METHOD(print, portName:(NSString *)portName
                  emulation:(NSString *)emulation
                  printCommands:(NSArray *) printCommands
