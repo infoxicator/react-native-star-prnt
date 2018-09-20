@@ -396,6 +396,33 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
         [self sendData:@"printerPaperReady" data:nil];
 }
 
+
+
+#pragma mark -
+#pragma mark App Lifecycle
+#pragma mark -
+
+- (void)onAppTerminate
+{
+    if (_printerManager != nil && _printerManager.port != nil) {
+        [_printerManager disconnect];
+    }
+}
+
+- (void)dispose
+{
+    if (_printerManager != nil && _printerManager.port != nil) {
+        [_printerManager disconnect];
+    }
+}
+
+- (void)invalidate
+{
+    if (_printerManager != nil && _printerManager.port != nil) {
+        [_printerManager disconnect];
+    }
+}
+
 #pragma mark -
 #pragma mark Cash drawer events
 #pragma mark -
