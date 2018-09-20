@@ -143,9 +143,8 @@ RCT_REMAP_METHOD(connect, portName:(NSString *)portName
                  connectWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-
         NSString *portSettings = [self getPortSettingsOption:emulation];
-    
+        if (_printerManager == nil) {
         if (portName != nil && portName != (id)[NSNull null]){
             if ([hasBarcodeReader isEqual:@(YES)]) {
                 _printerManager = [[StarIoExtManager alloc] initWithType:StarIoExtManagerTypeWithBarcodeReader
@@ -160,7 +159,10 @@ RCT_REMAP_METHOD(connect, portName:(NSString *)portName
             }
             _printerManager.delegate = self;
         }
-    
+        } else if (_printerManager.port != nil) {
+          [_printerManager disconnect];
+        }
+
     
         if ([_printerManager connect] == NO) {
             NSDictionary *userInfo = @{
