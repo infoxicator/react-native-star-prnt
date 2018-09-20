@@ -94,26 +94,35 @@ RCT_REMAP_METHOD(checkStatus, portName:(NSString *)portName
     SMPort *port = nil;
     StarPrinterStatus_2 status;
     NSString *portSettings = [self getPortSettingsOption:emulation];
+    NSDictionary *firmwareInformation = [[NSMutableDictionary alloc] init];
+
     @try {
-        
+    if(portName != nil && portName != (id)[NSNull null]){
         port = [SMPort getPort:portName :portSettings :10000];     // 10000mS!!!
-        
         // Sleep to avoid a problem which sometimes cannot communicate with Bluetooth.
-        
         NSOperatingSystemVersion version = {11, 0, 0};
         BOOL isOSVer11OrLater = [[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:version];
         if ((isOSVer11OrLater) && ([portName.uppercaseString hasPrefix:@"BT:"])) {
             [NSThread sleepForTimeInterval:0.2];
         }
-        
+
         [port getParsedStatus:&status :2];
-        NSDictionary *firmwareInformation = [[NSMutableDictionary alloc] init];
         @try {
             firmwareInformation = [port getFirmwareInformation];
         }
         @catch (PortException *exception) {
             //unable to get Firmware
         }
+      } else {
+        [_printerManager.port getParsedStatus:&status :2];
+        @try {
+          firmwareInformation = [_printerManager.port getFirmwareInformation];
+        }
+        @catch (PortException *exception) {
+            //unable to get Firmware
+        }
+    }
+
         
         NSDictionary *statusDictionary = [self portStatusToDictionary:status :firmwareInformation];
         resolve (statusDictionary);
