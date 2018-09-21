@@ -467,43 +467,15 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
     @ReactMethod
     private boolean sendCommandsDoNotCheckCondition(byte[] commands, StarIOPort port, Promise promise) {
         try {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-            }
             if (port == null) { //Not connected or port closed
                 promise.reject("STARIO_PORT_EXCEPTION", "Unable to Open Port, Please Connect to the printer before sending commands");
                 return false;
             }
-            StarPrinterStatus status;
-            status = port.beginCheckedBlock();
-            if (status.offline) {
-                //sendEvent("printerOffline", null);
-                throw new StarIOPortException("A printer is offline");
-                //callbackContext.error("The printer is offline");
-            }
-
             port.writePort(commands, 0, commands.length);
             port.setEndCheckedBlockTimeoutMillis(30000);// Change the timeout time of endCheckedBlock method.
-            status = port.endCheckedBlock();
-
-            if (status.coverOpen) {
-                promise.reject("STARIO_PORT_EXCEPTION", "Cover open");
-                //sendEvent("printerCoverOpen", null);
-                return false;
-            } else if (status.receiptPaperEmpty) {
-                promise.reject("STARIO_PORT_EXCEPTION", "Empty paper");
-                //sendEvent("printerPaperEmpty", null);
-                return false;
-            } else if (status.offline) {
-                promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
-                //sendEvent("printerOffline", null);
-                return false;
-            }
             promise.resolve("Success!");
-
         } catch (StarIOPortException e) {
-            //sendEvent("printerImpossible", e.getMessage());
+            sendEvent("printerImpossible", e.getMessage());
             promise.reject("STARIO_PORT_EXCEPTION", e.getMessage());
             return false;
         } finally {
