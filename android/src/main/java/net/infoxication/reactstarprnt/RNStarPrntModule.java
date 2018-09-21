@@ -229,7 +229,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
         byte[] commands = builder.getCommands();
 
-        if (portName == "null") { // use StarIOExtManager
+        if (portName == null) { // use StarIOExtManager
           sendCommand(commands, starIoExtManager.getPort(), promise);
 
         } else {//use StarIOPort
