@@ -472,7 +472,6 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
                 return false;
             }
             port.writePort(commands, 0, commands.length);
-            port.setEndCheckedBlockTimeoutMillis(30000);// Change the timeout time of endCheckedBlock method.
             promise.resolve("Success!");
         } catch (StarIOPortException e) {
             sendEvent("printerImpossible", e.getMessage());
