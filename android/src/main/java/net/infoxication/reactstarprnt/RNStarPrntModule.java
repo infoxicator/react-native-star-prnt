@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -329,6 +328,9 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
     private String getPortSettingsOption(String emulation) { // generate the portsettings depending on the emulation type
 
         String portSettings = "";
+        if (emulation == null) {
+            return portSettings;
+        }
 
         switch (emulation) {
             case "EscPosMobile":
