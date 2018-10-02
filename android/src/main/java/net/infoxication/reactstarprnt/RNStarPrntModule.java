@@ -193,6 +193,36 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void showOnCustomerDisplay(final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
+        final String portSettings = getPortSettingsOption(emulation);
+        final Context context = getCurrentActivity();
+
+        new Thread(new Runnable() {
+            public void run() {
+                Log.d("WavyDebug", "0");
+                IDisplayCommandBuilder builder = StarIoExt.createDisplayCommandBuilder(StarIoExt.DisplayModel.SCD222);
+                builder.appendClearScreen();
+                builder.appendCursorMode(IDisplayCommandBuilder.CursorMode.Off);
+                builder.appendHomePosition();
+                for (int i = 0; i < displayCommands.size(); i++) {
+                    ReadableMap command = displayCommands.getMap(i);
+                    try {
+                        builder.append(command.getString("appendCustomerDisplay").getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+                byte[] commands = builder.getPassThroughCommands();
+                if (portName == null) {
+                    sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
+                } else {
+                    sendCommand(context, portName, portSettings, commands, promise);
+                }
+            }
+        }).start();
+    }
+
+    @ReactMethod
     public void print(final String portName, String emulation, final ReadableArray printCommands, final Promise promise) {
 
         final String portSettings = getPortSettingsOption(emulation);
