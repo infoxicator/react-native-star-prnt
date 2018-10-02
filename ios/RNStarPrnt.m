@@ -332,6 +332,43 @@ RCT_REMAP_METHOD(showOnCustomerDisplay, portName:(NSString *)portName
             [self showSimpleAlertWithTitle:@"Failure" message:@"Display Disconnect." buttonTitle:@"OK" buttonStyle:UIAlertActionStyleCancel completion:nil];
         }
 }
+RCT_REMAP_METHOD(cleanCustomerDisplay, portName:(NSString *)portName
+                 emulation:(NSString *)emulation
+                 printCommands:(NSArray *) printCommands
+                 sendOptimisticPrintCommandWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSString *portSettings = [self getPortSettingsOption:emulation];
+    
+    StarIoExtEmulation Emulation = [self getEmulation:emulation];
+    
+    ISDCBBuilder *builder = [StarIoExt createDisplayCommandBuilder:StarIoExtDisplayModelSCD222];
+
+    _internationalType = [_pickerView selectedRowInComponent:0];
+    _codePageType      = [_pickerView selectedRowInComponent:1];
+    
+    [DisplayFunctions appendCharacterSet:builder internationalType:_internationalType codePageType:_codePageType];
+ 
+    [DisplayFunctions appendClearScreen:builder];
+
+    NSData *commands = [builder.passThroughCommands copy];
+    
+    if(portName != nil && portName != (id)[NSNull null]){
+    
+    if (_displayStatus == DisplayStatusConnect) {
+            dispatch_async(GlobalQueueManager.sharedManager.serialQueue, ^{
+                [Communication sendCommandsDoNotCheckCondition:commands port:self->_port completionHandler:^(BOOL result, NSString *title, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (result == NO) {
+                            [self showSimpleAlertWithTitle:title message:message buttonTitle:@"OK" buttonStyle:UIAlertActionStyleCancel completion:nil];
+                        }                    
+                    });
+                }];
+            });
+        } else {
+            [self showSimpleAlertWithTitle:@"Failure" message:@"Display Disconnect." buttonTitle:@"OK" buttonStyle:UIAlertActionStyleCancel completion:nil];
+        }
+}
 
 RCT_REMAP_METHOD(print, portName:(NSString *)portName
                  emulation:(NSString *)emulation
