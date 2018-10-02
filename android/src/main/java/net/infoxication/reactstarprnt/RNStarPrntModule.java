@@ -207,6 +207,8 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
                 builder.appendClearScreen();
                 builder.appendCursorMode(IDisplayCommandBuilder.CursorMode.Off);
                 builder.appendHomePosition();
+                    builder.appendInternational(IDisplayCommandBuilder.InternationalType.France);
+                    builder.appendCodePage(IDisplayCommandBuilder.CodePageType.CP1252);
                 for (int i = 0; i < displayCommands.size(); i++) {
                     ReadableMap command = displayCommands.getMap(i);
                     try {
