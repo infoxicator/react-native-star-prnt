@@ -285,7 +285,9 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
     }
 
     private Emulation getEmulation(String emulation) {
-
+        if (emulation == null) {
+            return Emulation.StarPRNT;
+        }
         if (emulation.equals("StarPRNT")) return Emulation.StarPRNT;
         else if (emulation.equals("StarPRNTL")) return Emulation.StarPRNTL;
         else if (emulation.equals("StarLine")) return Emulation.StarLine;
