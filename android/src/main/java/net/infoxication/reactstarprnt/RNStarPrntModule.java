@@ -197,30 +197,38 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showOnCustomerDisplay(final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
-        final String portSettings = getPortSettingsOption(emulation);
-        final Context context = getCurrentActivity();
+        if(starIoExtManager != null) {
+            final String portSettings = getPortSettingsOption(emulation);
+            final Context context = getCurrentActivity();
 
-        new Thread(new Runnable() {
-            public void run() {
-                Log.d("WavyDebug", "0");
-                IDisplayCommandBuilder builder = StarIoExt.createDisplayCommandBuilder(StarIoExt.DisplayModel.SCD222);
-                builder.appendClearScreen();
-                builder.appendCursorMode(IDisplayCommandBuilder.CursorMode.Off);
-                builder.appendHomePosition();
+            new Thread(new Runnable() {
+                public void run() {
+                    IDisplayCommandBuilder builder = StarIoExt.createDisplayCommandBuilder(StarIoExt.DisplayModel.SCD222);
+                    builder.appendClearScreen();
+                    builder.appendCursorMode(IDisplayCommandBuilder.CursorMode.Off);
+                    builder.appendHomePosition();
                     builder.appendInternational(IDisplayCommandBuilder.InternationalType.France);
                     builder.appendCodePage(IDisplayCommandBuilder.CodePageType.CP1252);
-                for (int i = 0; i < displayCommands.size(); i++) {
-                    ReadableMap command = displayCommands.getMap(i);
-                    try {
-                        builder.append(command.getString("appendCustomerDisplay").getBytes("UTF-8"));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                    for (int i = 0; i < displayCommands.size(); i++) {
+                        ReadableMap command = displayCommands.getMap(i);
+                        try {
+                            builder.append(command.getString("appendCustomerDisplay").getBytes("UTF-8"));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    byte[] commands = builder.getPassThroughCommands();
+                    if (portName == null) {
+                        sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
+                    } else {//use StarIOPort
+                        sendCommand(context, portName, portSettings, commands, promise);
                     }
                 }
-                byte[] commands = builder.getPassThroughCommands();
-                if (portName == null) {
-                    sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
-                } else {
+            }).start();
+        } else {
+            promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
+        }
+    }
 
     @ReactMethod
     public void cleanCustomerDisplay(final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
@@ -242,11 +250,11 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
                     if (portName == null) {
                         sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
                     } else {
-                    sendCommand(context, portName, portSettings, commands, promise);
+                        sendCommand(context, portName, portSettings, commands, promise);
+                    }
                 }
-            }
 
-        }).start();
+            }).start();
         } else {
             promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
         }
@@ -255,64 +263,70 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void print(final String portName, String emulation, final ReadableArray printCommands, final Promise promise) {
+        if(starIoExtManager != null) {
+            final String portSettings = getPortSettingsOption(emulation);
+            final Emulation _emulation = getEmulation(emulation);
+            final Context context = getCurrentActivity();
 
-        final String portSettings = getPortSettingsOption(emulation);
-        final Emulation _emulation = getEmulation(emulation);
-        final Context context = getCurrentActivity();
+            new Thread(new Runnable() {
+                public void run() {
 
-        new Thread(new Runnable() {
-            public void run() {
-                
-                ICommandBuilder builder = StarIoExt.createCommandBuilder(_emulation);
+                    ICommandBuilder builder = StarIoExt.createCommandBuilder(_emulation);
 
-                builder.beginDocument();
+                    builder.beginDocument();
 
-                appendCommands(builder, printCommands, context);
+                    appendCommands(builder, printCommands, context);
 
-                builder.endDocument();
+                    builder.endDocument();
 
-                byte[] commands = builder.getCommands();
+                    byte[] commands = builder.getCommands();
 
-                // use StarIOExtManager
-                if (portName == null) {
-                    sendCommand(commands, starIoExtManager.getPort(), promise);
-                } else {//use StarIOPort
-                    sendCommand(context, portName, portSettings, commands, promise);
+                    // use StarIOExtManager
+                    if (portName == null) {
+                        sendCommand(commands, starIoExtManager.getPort(), promise);
+                    } else {//use StarIOPort
+                        sendCommand(context, portName, portSettings, commands, promise);
+                    }
                 }
-            }
 
-        }).start();
+            }).start();
+        } else {
+            promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
+        }
     }
 
     @ReactMethod
     public void optimisticPrint(final String portName, String emulation, final ReadableArray printCommands, final Promise promise) {
+        if(starIoExtManager != null) {
+            final String portSettings = getPortSettingsOption(emulation);
+            final Emulation _emulation = getEmulation(emulation);
+            final Context context = getCurrentActivity();
 
-        final String portSettings = getPortSettingsOption(emulation);
-        final Emulation _emulation = getEmulation(emulation);
-        final Context context = getCurrentActivity();
+            new Thread(new Runnable() {
+                public void run() {
 
-        new Thread(new Runnable() {
-            public void run() {
+                    ICommandBuilder builder = StarIoExt.createCommandBuilder(_emulation);
 
-                ICommandBuilder builder = StarIoExt.createCommandBuilder(_emulation);
+                    builder.beginDocument();
 
-                builder.beginDocument();
+                    appendCommands(builder, printCommands, context);
 
-                appendCommands(builder, printCommands, context);
+                    builder.endDocument();
 
-                builder.endDocument();
+                    byte[] commands = builder.getCommands();
 
-                byte[] commands = builder.getCommands();
-
-                // use StarIOExtManager
-                if (portName == null) {
-                    sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
-                } else {//use StarIOPort
-                    sendCommand(context, portName, portSettings, commands, promise);
+                    if (portName == null) {
+                        sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
+                    } else {
+                        sendCommand(context, portName, portSettings, commands, promise);
+                    }
                 }
-            }
 
-        }).start();
+            }).start();
+        } else {
+            promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
+        }
+
     }
 
     private Emulation getEmulation(String emulation) {
