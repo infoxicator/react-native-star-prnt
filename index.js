@@ -256,15 +256,12 @@ export class StarPRNT {
         return RNStarPrnt.print(port, emulation, commandsArray); 
     }
 
-      /**
-     * Sends an Array of commands to the command buffer using the Android IDisplayCommandBuilder or iOS TODO: Change : ISCBBuilderInterface
-     * @param {string} emulation  StarPrinter Emulation type: "StarPRNT", "StarPRNTL", "StarLine", "StarGraphic", "EscPos", "EscPosMobile", "StarDotImpact"
-     * @param {CommandsArray} commandsArray  each command in the array should be an instance of the PrintCommand object. Example [{append:"text"}, {"openCashDrawer: 1"}]
-     * * @param {string} port Optional. printer name i.e BT:StarMicronics. If not set, a printer connected via StarIOExtManager using the connect() function will be used.
-     * @return {Promise<any>} Success! if printed correctly or error message string returned by the SDK.
-     */
     static showOnCustomerDisplay(emulation, commandsArray, port) { 
         return RNStarPrnt.showOnCustomerDisplay(port, emulation, commandsArray); 
+    }
+
+    static cleanCustomerDisplay(emulation, commandsArray, port) {
+        return RNStarPrnt.cleanCustomerDisplay(port, emulation, commandsArray); 
     }
 
 
