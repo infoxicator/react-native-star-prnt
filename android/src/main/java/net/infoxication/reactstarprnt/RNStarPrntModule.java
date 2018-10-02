@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -20,6 +21,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import com.starmicronics.stario.StarIOPort;
 import com.starmicronics.stario.StarIOPortException;
 import com.starmicronics.stario.StarPrinterStatus;
 import com.starmicronics.starioextension.IConnectionCallback;
+import com.starmicronics.starioextension.IDisplayCommandBuilder;
 import com.starmicronics.starioextension.StarIoExt;
 import com.starmicronics.starioextension.StarIoExt.Emulation;
 import com.starmicronics.starioextension.ICommandBuilder;
@@ -231,7 +234,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
         new Thread(new Runnable() {
             public void run() {
-
+                
                 ICommandBuilder builder = StarIoExt.createCommandBuilder(_emulation);
 
                 builder.beginDocument();
