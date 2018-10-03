@@ -258,7 +258,37 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
         } else {
             promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
         }
+    }
 
+    @ReactMethod
+    public void turnCustomerDisplay(final String turnTo, final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
+        if (!turnTo.equals("on") || !turnTo.equals("off")){
+            promise.reject("STARIO_PORT_EXCEPTION", "Bad turnTo parameter");
+        }
+        if(starIoExtManager != null) {
+            final String portSettings = getPortSettingsOption(emulation);
+            final Context context = getCurrentActivity();
+
+            new Thread(new Runnable() {
+                public void run() {
+                    IDisplayCommandBuilder builder = StarIoExt.createDisplayCommandBuilder(StarIoExt.DisplayModel.SCD222);
+                    if (turnTo.equal("on")){
+                        builder.appendTurnOn(true);
+                    } else {
+                        builder.appendTurnOn(false);
+                    }
+                    byte[] commands = builder.getPassThroughCommands();
+
+                    if (portName == null) {
+                        sendCommandsDoNotCheckCondition(commands, starIoExtManager.getPort(), promise);
+                    } else {
+                        sendCommand(context, portName, portSettings, commands, promise);
+                    }
+                }
+            }).start();
+        } else {
+            promise.reject("STARIO_PORT_EXCEPTION", "Printer offline");
+        }
     }
 
     @ReactMethod
