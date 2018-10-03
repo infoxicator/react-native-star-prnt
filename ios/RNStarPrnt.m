@@ -291,45 +291,87 @@ RCT_REMAP_METHOD(optimisticPrint, portName:(NSString *)portName
 
 RCT_REMAP_METHOD(showOnCustomerDisplay, portName:(NSString *)portName
                  emulation:(NSString *)emulation
-                 printCommands:(NSArray *) printCommands
-                 sendOptimisticPrintCommandWithResolver:(RCTPromiseResolveBlock)resolve
+                 printCommands:(NSArray *) displayCommands
+                 showOnCustomerDisplayResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSString *portSettings = [self getPortSettingsOption:emulation];
     
-    StarIoExtEmulation Emulation = [self getEmulation:emulation];
-    
     ISDCBBuilder *builder = [StarIoExt createDisplayCommandBuilder:StarIoExtDisplayModelSCD222];
 
-    _internationalType = [_pickerView selectedRowInComponent:0];
-    _codePageType      = [_pickerView selectedRowInComponent:1];
+    [builder appendClearScreen];
     
-    [DisplayFunctions appendCharacterSet:builder internationalType:_internationalType codePageType:_codePageType];
+    [builder appendCursorMode:SDCBCursorModeOff];
  
-    [builder beginDocument];
+    [builder appendSpecifiedPosition:1 y:1];
     
-    [self appendCommands:builder printCommands:printCommands];
+    [builder appendHomePosition];
 
-    [builder endDocument];
+    [builder appendInternational:SDCBInternationalTypeFrance];
     
-    [builder endDocument];
+    [builder appendCodePage     :SDCBCodePageTypeCP1252];
+
+//    unsigned char initial[] = {0x1b, 0x40};
+//    [builder appendBytes:initial length:2];
+//
+//    unsigned char utf8[] = {0x1b, 0x1d, 0x74, 0x80};
+//    [builder appendBytes:utf8 length:4];
+
+    for (id command in displayCommands){
+        NSString *string = [command valueForKey:@"appendCustomerDisplay"];
+        const char *array = [ string UTF8String ];
+        [builder appendBytes:array length:[string length]];
+    }
 
     NSData *commands = [builder.passThroughCommands copy];
     
     if(portName != nil && portName != (id)[NSNull null]){
+        [Communication sendCommandsDoNotCheckCondition:commands
+                                              portName:portName
+                                          portSettings:portSettings
+                                               timeout:10000
+                                     completionHandler:^(BOOL result, NSString *title, NSString *message) {
+                                         if(result == YES){
+                                             NSMutableDictionary *resultMessage = [[NSMutableDictionary alloc] init];
+                                             [resultMessage setObject:[NSNumber numberWithBool:result == SM_TRUE] forKey:@"result"];
+                                             [resultMessage setObject:title forKey:@"title"];
+                                             [resultMessage setObject:message forKey:@"message"];
     
-    if (_displayStatus == DisplayStatusConnect) {
-            dispatch_async(GlobalQueueManager.sharedManager.serialQueue, ^{
-                [Communication sendCommandsDoNotCheckCondition:commands port:self->_port completionHandler:^(BOOL result, NSString *title, NSString *message) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (result == NO) {
-                            [self showSimpleAlertWithTitle:title message:message buttonTitle:@"OK" buttonStyle:UIAlertActionStyleCancel completion:nil];
+                                             resolve(resultMessage);
+                                         }else{
+                                             NSDictionary *userInfo = @{
+                                                                        NSLocalizedDescriptionKey: NSLocalizedString(title, nil),
+                                                                        NSLocalizedFailureReasonErrorKey: NSLocalizedString(message, nil),
+                                                                        NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(@"Check the printer is online and connected to the device", nil)
+                                                                        };
+                                             NSError *error = [[NSError alloc] initWithDomain:@"StarPrntErrorDomain"
+                                                                                         code:-1 userInfo:userInfo];
+                                             reject(title, message, error);
                         }                    
-                    });
                 }];
-            });
-        } else {
-            [self showSimpleAlertWithTitle:@"Failure" message:@"Display Disconnect." buttonTitle:@"OK" buttonStyle:UIAlertActionStyleCancel completion:nil];
+    }else{
+        [Communication sendCommandsDoNotCheckCondition:commands
+                                                  port:_printerManager.port
+                                     completionHandler:^(BOOL result, NSString *title, NSString *message) {
+                                         if(result == YES){
+                                             NSMutableDictionary *resultMessage = [[NSMutableDictionary alloc] init];
+                                             [resultMessage setObject:[NSNumber numberWithBool:result == SM_TRUE] forKey:@"result"];
+                                             [resultMessage setObject:title forKey:@"title"];
+                                             [resultMessage setObject:message forKey:@"message"];
+                                             
+                                             resolve(resultMessage);
+                                         }else{
+                                             NSDictionary *userInfo = @{
+                                                                        NSLocalizedDescriptionKey: NSLocalizedString(title, nil),
+                                                                        NSLocalizedFailureReasonErrorKey: NSLocalizedString(message, nil),
+                                                                        NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(@"Check the printer is online and connected to the device", nil)
+                                                                        };
+                                             NSError *error = [[NSError alloc] initWithDomain:@"StarPrntErrorDomain"
+                                                                                         code:-1 userInfo:userInfo];
+                                             reject(title, message, error);
+                                         }
+                                     }];
+        
         }
 }
 RCT_REMAP_METHOD(cleanCustomerDisplay, portName:(NSString *)portName
