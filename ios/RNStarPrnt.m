@@ -388,10 +388,8 @@ RCT_REMAP_METHOD(cleanCustomerDisplay, portName:(NSString *)portName
         [builder appendClearScreen];
     
         NSData *commands = [builder.passThroughCommands copy];
-        RCTLogInfo(@"cleanCustomerDisplay0");
  
         if(portName != nil && portName != (id)[NSNull null]){
-            RCTLogInfo(@"cleanCustomerDisplay1");
 
             [Communication sendCommandsDoNotCheckCondition:commands
                                                   portName:portName
@@ -417,7 +415,6 @@ RCT_REMAP_METHOD(cleanCustomerDisplay, portName:(NSString *)portName
                                              }
                                          }];
         }else{ //Use StarIOExtManager and send command to connected printer
-            RCTLogInfo(@"cleanCustomerDisplay2");
     
             [Communication sendCommandsDoNotCheckCondition:commands
                                                       port:_printerManager.port
