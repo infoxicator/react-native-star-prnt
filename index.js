@@ -264,6 +264,10 @@ export class StarPRNT {
         return RNStarPrnt.cleanCustomerDisplay(port, emulation, commandsArray); 
     }
 
+    static turnCustomerDisplay(turnTo, emulation, commandsArray, port) {
+        return RNStarPrnt.turnCustomerDisplay(turnTo, port, emulation, commandsArray); 
+    }
+
 
   /**
  * Same as print, but don't perform a checkStatus before and after print
