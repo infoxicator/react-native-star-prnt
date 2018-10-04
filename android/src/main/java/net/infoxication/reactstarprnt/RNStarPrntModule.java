@@ -262,7 +262,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void turnCustomerDisplay(final String turnTo, final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
-        if (!turnTo.equals("on") || !turnTo.equals("off")){
+        if (!turnTo.equals("on") && !turnTo.equals("off")){
             promise.reject("STARIO_PORT_EXCEPTION", "Bad turnTo parameter");
         }
         if(starIoExtManager != null) {
@@ -272,7 +272,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
             new Thread(new Runnable() {
                 public void run() {
                     IDisplayCommandBuilder builder = StarIoExt.createDisplayCommandBuilder(StarIoExt.DisplayModel.SCD222);
-                    if (turnTo.equal("on")){
+                    if (turnTo.equals("on")){
                         builder.appendTurnOn(true);
                     } else {
                         builder.appendTurnOn(false);
