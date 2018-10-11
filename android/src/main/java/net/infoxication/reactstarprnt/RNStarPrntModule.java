@@ -196,7 +196,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void showOnCustomerDisplay(final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
+    public void showPriceIndicator(final String portName, String emulation, final ReadableArray displayCommands, final Promise promise) {
         if(starIoExtManager != null) {
             final String portSettings = getPortSettingsOption(emulation);
             final Context context = getCurrentActivity();

@@ -256,8 +256,8 @@ export class StarPRNT {
         return RNStarPrnt.print(port, emulation, commandsArray); 
     }
 
-    static showOnCustomerDisplay(emulation, commandsArray, port) { 
-        return RNStarPrnt.showOnCustomerDisplay(port, emulation, commandsArray); 
+    static showPriceIndicator(emulation, commandsArray, port) { 
+        return RNStarPrnt.showPriceIndicator(port, emulation, commandsArray); 
     }
 
     static cleanCustomerDisplay(emulation, commandsArray, port) {

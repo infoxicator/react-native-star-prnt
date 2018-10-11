@@ -289,10 +289,10 @@ RCT_REMAP_METHOD(optimisticPrint, portName:(NSString *)portName
     
 }
 
-RCT_REMAP_METHOD(showOnCustomerDisplay, portName:(NSString *)portName
+RCT_REMAP_METHOD(showPriceIndicator, portName:(NSString *)portName
                  emulation:(NSString *)emulation
                  printCommands:(NSArray *) displayCommands
-                 showOnCustomerDisplayResolver:(RCTPromiseResolveBlock)resolve
+                 showPriceIndicatorResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSString *portSettings = [self getPortSettingsOption:emulation];
