@@ -101,9 +101,9 @@
         break;
       }
       
-      // StarPrinterStatus_2 printerStatus;
+      StarPrinterStatus_2 printerStatus;
       
-      // [port getParsedStatus:&printerStatus :2];
+      [port getParsedStatus:&printerStatus :2];
       
       //          if (printerStatus.offline == SM_TRUE) {     // Do not check condition.
       //              title   = @"Printer Error";
@@ -131,7 +131,7 @@
         break;
       }
       
-      // [port getParsedStatus:&printerStatus :2];
+      [port getParsedStatus:&printerStatus :2];
       
       //          if (printerStatus.offline == SM_TRUE) {     // Do not check condition.
       //              title   = @"Printer Error";
@@ -386,9 +386,9 @@
         [NSThread sleepForTimeInterval:0.2];
       }
       
-      // StarPrinterStatus_2 printerStatus;
+      StarPrinterStatus_2 printerStatus;
       
-      // [port getParsedStatus:&printerStatus :2];
+      [port getParsedStatus:&printerStatus :2];
       
       //          if (printerStatus.offline == SM_TRUE) {     // Do not check condition.
       //              title   = @"Printer Error";
@@ -416,7 +416,7 @@
         break;
       }
       
-      // [port getParsedStatus:&printerStatus :2];
+      [port getParsedStatus:&printerStatus :2];
       
       //          if (printerStatus.offline == SM_TRUE) {     // Do not check condition.
       //              title   = @"Printer Error";
