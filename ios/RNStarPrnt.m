@@ -453,13 +453,7 @@ RCT_REMAP_METHOD(appendTurnOn, portName:(NSString *)portName
 
         [builder appendClearScreen];
 
-        if (appendTurnOn == "on"){
-            [builder appendTurnOn:TRUE];
-        } else if (appendTurnOn == "off"){
-            [builder appendTurnOn:FALSE];
-        } else {
-            reject(@"appendTurnOn Failed", @"argument should be 'on' or 'off'", nil);
-        }
+        reject(@"appendTurnOn Failed", @"argument should be 'on' or 'off'", nil);
 
         NSData *commands = [builder.passThroughCommands copy];
  
