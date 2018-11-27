@@ -42,11 +42,19 @@ import com.starmicronics.starioextension.ICommandBuilder.CutPaperAction;
 import com.starmicronics.starioextension.ICommandBuilder.CodePageType;
 import com.starmicronics.starioextension.StarIoExtManager;
 import com.starmicronics.starioextension.StarIoExtManagerListener;
+import com.starmicronics.starioextension.IPeripheralConnectParser;
 
 public class RNStarPrntModule extends ReactContextBaseJavaModule {
+    private enum PeripheralStatus {
+        Invalid,
+        Impossible,
+        Connect,
+        Disconnect,
+    }
 
     private final ReactApplicationContext reactContext;
     private StarIoExtManager starIoExtManager;
+    private PeripheralStatus displayStatus = PeripheralStatus.Invalid;
 
     public RNStarPrntModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -200,6 +208,52 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
         if(starIoExtManager != null) {
             final String portSettings = getPortSettingsOption(emulation);
             final Context context = getCurrentActivity();
+
+            final IPeripheralConnectParser parser = StarIoExt.createDisplayConnectParser(StarIoExt.DisplayModel.SCD222);
+
+            // WIP
+            Communication.parseDoNotCheckCondition(DisplayFragment.class, parser, mPort, new Communication.SendCallback() {
+                @Override
+                public void onStatus(boolean result, Communication.Result communicateResult) {
+                    mWaitCallback = false;
+
+                    if (!mIsForeground) {
+                        return;
+                    }
+
+                    if (communicateResult == Communication.Result.Success) {
+                        if (parser.isConnected()) {
+                            if (mDisplayStatus != PeripheralStatus.Connect) {
+                                mComment.clearAnimation();
+                                mComment.setText("");
+
+                                mDisplayStatus = PeripheralStatus.Connect;
+                            }
+                        }
+                        else {
+                            if (mDisplayStatus != PeripheralStatus.Disconnect) {
+                                Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.blink);
+                                mComment.startAnimation(animation);
+                                mComment.setTextColor(Color.RED);
+                                mComment.setText("Display Disconnect");
+
+                                mDisplayStatus = PeripheralStatus.Disconnect;
+                            }
+                        }
+                    }
+                    else {
+                        if (mDisplayStatus != PeripheralStatus.Impossible) {
+                            Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.blink);
+                            mComment.startAnimation(animation);
+                            mComment.setTextColor(Color.RED);
+                            mComment.setText("Printer Impossible");
+
+                            mDisplayStatus = PeripheralStatus.Impossible;
+                        }
+                    }
+                }
+            });
+
 
             new Thread(new Runnable() {
                 public void run() {
