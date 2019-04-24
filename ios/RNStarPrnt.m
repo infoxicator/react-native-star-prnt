@@ -534,8 +534,15 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
             BOOL diffusion = ([[command valueForKey:@"diffusion"] boolValue] == NO) ? NO : YES;
             BOOL bothScale = ([[command valueForKey:@"bothScale"] boolValue]  == NO) ? NO : YES;
             SCBBitmapConverterRotation rotation = [self getBitmapConverterRotation:[command valueForKey:@"rotation"]];
+            NSError *error = nil;
             NSURL *imageURL = [NSURL URLWithString:urlString];
-            NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
+            NSData *imageData = [NSData dataWithContentsOfURL:imageURL options:NSDataReadingUncached error:&error];
+
+            if (error != nil) {
+                NSURL *fileImageURL = [NSURL fileURLWithPath:urlString];
+                imageData = [NSData dataWithContentsOfURL:fileImageURL];
+            }
+
             UIImage *image = [UIImage imageWithData:imageData];
             
             if([command valueForKey:@"absolutePosition"]){
