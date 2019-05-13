@@ -12,13 +12,12 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "author@domain.cn" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/author/RNStarPrnt.git", :tag => "master" }
-  s.source_files  = "RNStarPrnt/**/*.{h,m}"
+  s.source_files  = "ios/**/*.{h,m}"
   s.requires_arc = true
 
 
   s.dependency "React"
-  s.vendored_frameworks = 'StarIO.framework'
-  s.vendored_frameworks = 'StarIO_Extension.framework'
+  s.vendored_frameworks = 'ios/Frameworks/StarIO.framework', 'ios/Frameworks/StarIO_Extension.framework'
 
   #s.dependency "others"
 
