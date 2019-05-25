@@ -588,6 +588,16 @@ export interface PrintCommand {
      * sends a appendPeripheral command to the printer for channel number: Example: 1 = No1, 2 = No2
      */
     openCashDrawer?: number;
+
+    /**
+     * Append array of bytes which will be interpreted as bitmap bytes.
+     */
+    appendBitmapBytes?: Array<number>;
+
+    /**
+     * Append base64 string bitmap.
+     */
+    appendBase64Bitmap?: string;
 }
 /**
  * Emulation constants
