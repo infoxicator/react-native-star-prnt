@@ -4,9 +4,20 @@ package net.infoxication.reactstarprnt;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
+import android.graphics.Canvas;
+import android.graphics.Typeface;
+import android.graphics.Rect;
+import android.graphics.Color;
+import android.provider.MediaStore;
+import android.text.TextPaint;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.text.StaticLayout;
+import android.text.Layout;
+import android.util.Base64;
+import android.graphics.BitmapFactory;
 
 import com.facebook.common.util.ExceptionWithNoStacktrace;
 import com.facebook.react.bridge.Dynamic;
@@ -572,9 +583,24 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
                 } catch (IOException e) {
 
                 }
+            } else if (command.hasKey("appendBitmapText")){
+                int fontSize = (command.hasKey("fontSize")) ? command.getInt("fontSize") : 25;
+                boolean diffusion = (command.hasKey("diffusion")) ? command.getBoolean("diffusion") : true;
+                int width = (command.hasKey("width")) ? command.getInt("width") : 576;
+                boolean bothScale = (command.hasKey("bothScale")) ? command.getBoolean("bothScale") : true;
+                String text = command.getString("appendBitmapText");
+                Typeface typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
+                Bitmap bitmap = createBitmapFromText(text, fontSize, width, typeface);
+                ICommandBuilder.BitmapConverterRotation rotation = (command.hasKey("rotation")) ? getConverterRotation(command.getString("rotation")) : getConverterRotation("Normal");
+                if(command.hasKey("absolutePosition")){
+                    int position =  command.getInt("absolutePosition");
+                    builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, position);
+                }else if(command.hasKey("alignment")){
+                    ICommandBuilder.AlignmentPosition alignmentPosition = getAlignment(command.getString("alignment"));
+                    builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, alignmentPosition);
+                }else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation);
             }
         }
-
     };
 
     //ICommandBuilder Constant Functions
@@ -782,6 +808,31 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);
     };
+
+    
+    private Bitmap createBitmapFromText(String printText, int textSize, int printWidth, Typeface typeface) {
+        Paint paint = new Paint();
+        Bitmap bitmap;
+        Canvas canvas;
+
+        paint.setTextSize(textSize);
+        paint.setTypeface(typeface);
+        paint.getTextBounds(printText, 0, printText.length(), new Rect());
+
+        TextPaint textPaint = new TextPaint(paint);
+        android.text.StaticLayout staticLayout = new StaticLayout(printText, textPaint, printWidth, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+
+        // Create bitmap
+        bitmap = Bitmap.createBitmap(staticLayout.getWidth(), staticLayout.getHeight(), Bitmap.Config.ARGB_8888);
+
+        // Create canvas
+        canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        canvas.translate(0, 0);
+        staticLayout.draw(canvas);
+
+        return bitmap;
+    }
 
 
     private StarIoExtManagerListener starIoExtManagerListener = new StarIoExtManagerListener() {
