@@ -126,7 +126,7 @@ Note: asterisk (*) indicates a required parameter
 
 The `portDiscovery(type, success, error)` Find available printers
 
-| Paremeter | Description | Type/Example |
+| Parameter | Description | Type/Example |
 | ----------- | -------- | ---------- |
 | type* | Port types are: 'All', 'Bluetooth', 'USB', 'LAN' | String |
 
@@ -134,7 +134,7 @@ The `portDiscovery(type, success, error)` Find available printers
 
 The `checkStatus(portName, emulation)` returns the current status of the printer, as well as model number and firmware information. *Checking status of a printer while connected to that printer can produce unexpected results.*
 
-| Paremeter | Description | Type/Example |
+| Parameter | Description | Type/Example |
 | ----------- | -------- | ---------- |
 | port* | Printer port name i.e BT:StarMicronics | String: "TCP:192.168.1.1" |
 | emulation* | Emulation type depending on the printer model | String: [Emulation](#emulation) |
@@ -144,7 +144,7 @@ The `checkStatus(portName, emulation)` returns the current status of the printer
 
 The `print(emulation, CommandsArray, portName)` Sends an Array of commands to the command buffer using the Android ICommandBuilderInterface or iOS ISCBBuilderInterface
 
-| Paremeter | Description | Type/Example |
+| Parameter | Description | Type/Example |
 | ----------- | -------- | ---------- |
 | emulation* | Emulation type depending on the printer model | String: [Emulation](#emulation) |
 | CommandsArray* | Each command in the array should be an instance of the [PrintCommand Object](#printcommand-object)  | Array:  [{append:"text"}, {"openCashDrawer: 1"}] |
