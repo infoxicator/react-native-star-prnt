@@ -126,7 +126,7 @@ Note: asterisk (*) indicates a required parameter
 
 The `portDiscovery(type, success, error)` Find available printers
 
-| Paremeter | Description | Type/Example |
+| Parameter | Description | Type/Example |
 | ----------- | -------- | ---------- |
 | type* | Port types are: 'All', 'Bluetooth', 'USB', 'LAN' | String |
 
