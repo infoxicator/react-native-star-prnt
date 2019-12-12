@@ -1,6 +1,6 @@
 {
   "name": "react-native-star-prnt",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "StarPRNT React Native bridge for Star Micronics Bluetooth/LAN printers",
   "types": "./types/index.d.ts",
   "main": "index.js",
