@@ -560,11 +560,17 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
             NSInteger width = ([command valueForKey:@"width"]) ? [[command valueForKey:@"width"] intValue] : 576;
             NSString *fontName = ([command valueForKey:@"font"]) ? [command valueForKey:@"font"] : @"Menlo";
             NSInteger fontSize = ([command valueForKey:@"fontSize"]) ? [[command valueForKey:@"fontSize"] intValue] : 12;
+            BOOL bothScale = ([[command valueForKey:@"bothScale"] boolValue]  == NO) ? NO : YES;
+            SCBBitmapConverterRotation rotation = SCBBitmapConverterRotationNormal;
 
             UIFont *font = [UIFont fontWithName:fontName size:fontSize * 2];
             UIImage *image = [self imageWithString:text font:font width:width];
 
-            [builder appendBitmap:image diffusion:NO];
+            if ([command valueForKey:@"alignment"]){
+                SCBAlignmentPosition alignment = [self getAlignment:[command valueForKey:@"alignment"]];
+                [builder appendBitmapWithAlignment:image diffusion:NO width:width bothScale:bothScale rotation:rotation position:alignment];
+            }
+            else [builder appendBitmap:image diffusion:NO];
         }
     }
     
