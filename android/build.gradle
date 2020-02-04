@@ -37,5 +37,8 @@ dependencies {
     compile files('libs/starioextension.jar')
     compile 'com.facebook.react:react-native:+'
     compile 'com.google.zxing:core:3.2.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testImplementation "org.mockito:mockito-core:2.28.2"
 }
   
