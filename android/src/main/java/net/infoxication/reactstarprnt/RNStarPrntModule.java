@@ -252,6 +252,23 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
     promise.resolve(defaultPaperSize);
   }
 
+  @ReactMethod
+  void getEmulation(final String modelName, final Promise promise) {
+    int model = ModelCapability.getModel(modelName);
+
+    if (model == NONE) {
+      promise.reject("Failed", "Failed");
+      return;
+    }
+
+    try {
+      String emulationMode = ModelCapability.getEmulation(model).name();
+      promise.resolve(emulationMode);
+    } catch(NullPointerException e) {
+      promise.reject("Failed", "Failed");
+    }
+  }
+
   private Emulation getEmulation(String emulation) {
 
     if (emulation.equals("StarPRNT")) return Emulation.StarPRNT;
