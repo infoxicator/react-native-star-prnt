@@ -4,63 +4,49 @@ package net.infoxication.reactstarprnt;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Paint;
 import android.graphics.Canvas;
-import android.graphics.Typeface;
-import android.graphics.Rect;
 import android.graphics.Color;
-import android.provider.MediaStore;
-import android.text.TextPaint;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.text.StaticLayout;
 import android.text.Layout;
-import android.util.Base64;
-import android.graphics.BitmapFactory;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 
-import com.facebook.common.util.ExceptionWithNoStacktrace;
-import com.facebook.react.bridge.Dynamic;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableType;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Locale;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.starmicronics.stario.PortInfo;
 import com.starmicronics.stario.StarIOPort;
 import com.starmicronics.stario.StarIOPortException;
 import com.starmicronics.stario.StarPrinterStatus;
+import com.starmicronics.starioextension.ConnectionCallback;
+import com.starmicronics.starioextension.ICommandBuilder;
+import com.starmicronics.starioextension.ICommandBuilder.CodePageType;
+import com.starmicronics.starioextension.ICommandBuilder.CutPaperAction;
 import com.starmicronics.starioextension.IConnectionCallback;
 import com.starmicronics.starioextension.StarIoExt;
 import com.starmicronics.starioextension.StarIoExt.Emulation;
-import com.starmicronics.starioextension.ICommandBuilder;
-import com.starmicronics.starioextension.ICommandBuilder.CutPaperAction;
-import com.starmicronics.starioextension.ICommandBuilder.CodePageType;
 import com.starmicronics.starioextension.StarIoExtManager;
 import com.starmicronics.starioextension.StarIoExtManagerListener;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
@@ -164,7 +150,7 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
     String portSettings = getPortSettingsOption(emulation);
     if (starIoExtManager != null && starIoExtManager.getPort() != null) {
-      starIoExtManager.disconnect(null);
+      starIoExtManager.disconnect((ConnectionCallback) null);
     }
     starIoExtManager = new StarIoExtManager(hasBarcodeReader ? StarIoExtManager.Type.WithBarcodeReader : StarIoExtManager.Type.Standard, portName, portSettings, 10000, context);
     starIoExtManager.setListener(starIoExtManagerListener);
