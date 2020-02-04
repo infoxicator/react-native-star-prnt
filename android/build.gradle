@@ -7,10 +7,12 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.7.4'
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'de.mobilej.unmock'
 
 android {
     compileSdkVersion 23
@@ -32,6 +34,34 @@ repositories {
     google()
 }
 
+unMock {
+    keep "android.widget.BaseAdapter"
+    keep "android.widget.ArrayAdapter"
+    keep "android.os.Bundle"
+    keepStartingWith "android.database.MatrixCursor"
+    keep "android.database.AbstractCursor"
+    keep "android.database.CrossProcessCursor"
+    keepStartingWith "android.text.TextUtils"
+    keepStartingWith "android.util."
+    keepStartingWith "android.text."
+    keepStartingWith "android.content.ContentValues"
+    keepStartingWith "android.content.ComponentName"
+    keepStartingWith "android.content.ContentUris"
+    keepStartingWith "android.content.ContentProviderOperation"
+    keepStartingWith "android.content.ContentProviderResult"
+    keepStartingWith "android.content.UriMatcher"
+    keepStartingWith "android.content.Intent"
+    keep "android.location.Location"
+    keepStartingWith "android.content.res.Configuration"
+    keepStartingWith "org."
+    keepStartingWith "libcore."
+    keepStartingWith "com.android.internal.R"
+    keepStartingWith "com.android.internal.util."
+    keep "android.net.Uri"
+
+    keepAndRename "java.nio.charset.Charsets" to "xjava.nio.charset.Charsets"
+}
+
 dependencies {
     compile files('libs/StarIOPort3.1.jar')
     compile files('libs/starioextension.jar')
@@ -39,6 +69,8 @@ dependencies {
     compile 'com.google.zxing:core:3.2.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.5.2'
     testImplementation "org.mockito:mockito-core:2.28.2"
+    unmock 'org.robolectric:android-all:4.3_r2-robolectric-0'
 }
   

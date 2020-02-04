@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static net.infoxication.reactstarprnt.ModelCapability.NONE;
+
 public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
@@ -235,6 +237,19 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
       }
 
     }).start();
+  }
+
+  @ReactMethod
+  void getDefaultPaperWidth(final String modelName, final Promise promise) {
+    int model = ModelCapability.getModel(modelName);
+
+    if (model == NONE) {
+        promise.reject("Failed", "Failed");
+        return;
+    }
+
+    int defaultPaperSize = ModelCapability.getDefaultPaperSize(model);
+    promise.resolve(defaultPaperSize);
   }
 
   private Emulation getEmulation(String emulation) {
