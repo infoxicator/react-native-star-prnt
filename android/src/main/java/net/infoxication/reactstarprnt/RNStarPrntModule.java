@@ -164,7 +164,17 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
     String portSettings = getPortSettingsOption(emulation);
     if (starIoExtManager != null && starIoExtManager.getPort() != null) {
-      starIoExtManager.disconnect(null);
+      starIoExtManager.disconnect(new IConnectionCallback() {
+        @Override
+        public void onConnected(ConnectResult connectResult) {
+          // Do nothing
+        }
+
+        @Override
+        public void onDisconnected() {
+          //Do nothing
+        }
+      });
     }
     starIoExtManager = new StarIoExtManager(hasBarcodeReader ? StarIoExtManager.Type.WithBarcodeReader : StarIoExtManager.Type.Standard, portName, portSettings, 10000, context);
     starIoExtManager.setListener(starIoExtManagerListener);
