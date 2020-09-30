@@ -13,7 +13,7 @@ import android.provider.MediaStore;
 import android.text.TextPaint;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.StaticLayout;
 import android.text.Layout;
 import android.util.Base64;
@@ -164,7 +164,22 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
 
     String portSettings = getPortSettingsOption(emulation);
     if (starIoExtManager != null && starIoExtManager.getPort() != null) {
-      starIoExtManager.disconnect(null);
+      starIoExtManager.disconnect(new IConnectionCallback() {
+          @Override
+          public void onConnected(ConnectResult connectResult) {
+              if (connectResult == ConnectResult.Success || connectResult == ConnectResult.AlreadyConnected) {
+
+                  promise.resolve("Printer Connected");
+
+              } else {
+                  promise.reject("CONNECT_ERROR", "Error Connecting to the printer");
+              }
+          }
+          @Override
+          public void onDisconnected() {
+              //Do nothing
+          }
+      });
     }
     starIoExtManager = new StarIoExtManager(hasBarcodeReader ? StarIoExtManager.Type.WithBarcodeReader : StarIoExtManager.Type.Standard, portName, portSettings, 10000, context);
     starIoExtManager.setListener(starIoExtManagerListener);
@@ -565,23 +580,23 @@ public class RNStarPrntModule extends ReactContextBaseJavaModule {
                 }else builder.appendQrCode(command.getString("appendQrCode").getBytes(encoding), qrCodeModel, qrCodeLevel, cell);
             } else if (command.hasKey("appendBitmap")){
                 ContentResolver contentResolver = context.getContentResolver();
-                String uriString = command.getString("appendBitmap");
+                String _uriString = command.getString("appendBitmap");
+                String uriString =  _uriString.substring(_uriString.indexOf(",")  + 1);
                 boolean diffusion = (command.hasKey("diffusion")) ? command.getBoolean("diffusion") : true;
                 int width = (command.hasKey("width")) ? command.getInt("width") : 576;
                 boolean bothScale = (command.hasKey("bothScale")) ? command.getBoolean("bothScale") : true;
                 ICommandBuilder.BitmapConverterRotation rotation = (command.hasKey("rotation")) ? getConverterRotation(command.getString("rotation")) : getConverterRotation("Normal");
-                try {
-                    Uri imageUri =  Uri.parse(uriString);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri);
-                    if(command.hasKey("absolutePosition")){
-                        int position =  command.getInt("absolutePosition");
-                        builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, position);
-                    }else if(command.hasKey("alignment")){
-                        ICommandBuilder.AlignmentPosition alignmentPosition = getAlignment(command.getString("alignment"));
-                        builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, alignmentPosition);
-                    }else builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation);
-                } catch (IOException e) {
 
+                final byte[] decodedBytes = Base64.decode(uriString, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                if(command.hasKey("absolutePosition")){
+                    int position =  command.getInt("absolutePosition");
+                    builder.appendBitmapWithAbsolutePosition(bitmap, diffusion, width, bothScale, rotation, position);
+                }else if(command.hasKey("alignment")){
+                    ICommandBuilder.AlignmentPosition alignmentPosition = getAlignment(command.getString("alignment"));
+                    builder.appendBitmapWithAlignment(bitmap, diffusion, width, bothScale, rotation, alignmentPosition);
+                }else {
+                  builder.appendBitmap(bitmap, diffusion, width, bothScale, rotation);
                 }
             } else if (command.hasKey("appendBitmapText")){
                 int fontSize = (command.hasKey("fontSize")) ? command.getInt("fontSize") : 25;
