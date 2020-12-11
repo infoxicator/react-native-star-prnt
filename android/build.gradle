@@ -6,13 +6,19 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath("com.android.tools.build:gradle:4.0.1")
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     compileSdkVersion 29
     buildToolsVersion = "29.0.2"
 
@@ -29,12 +35,17 @@ android {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
 }
 
 dependencies {
-    compile files('libs/StarIOPort3.1.jar')
-    compile files('libs/starioextension.jar')
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.google.zxing:core:3.2.1'
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+
+    implementation 'com.facebook.react:react-native:+'
+    implementation 'com.google.zxing:core:3.2.1'
 }
   

@@ -13,14 +13,11 @@ import android.provider.MediaStore;
 import android.text.TextPaint;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.text.StaticLayout;
 import android.text.Layout;
 import android.util.Base64;
 import android.graphics.BitmapFactory;
 
-import com.facebook.common.util.ExceptionWithNoStacktrace;
-import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
