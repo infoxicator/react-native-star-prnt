@@ -560,17 +560,22 @@ RCT_REMAP_METHOD(print, portName:(NSString *)portName
             NSInteger width = ([command valueForKey:@"width"]) ? [[command valueForKey:@"width"] intValue] : 576;
             NSString *fontName = ([command valueForKey:@"font"]) ? [command valueForKey:@"font"] : @"Menlo";
             NSInteger fontSize = ([command valueForKey:@"fontSize"]) ? [[command valueForKey:@"fontSize"] intValue] : 12;
+            BOOL diffusion = ([[command valueForKey:@"diffusion"] boolValue] == NO) ? NO : YES;
             BOOL bothScale = ([[command valueForKey:@"bothScale"] boolValue]  == NO) ? NO : YES;
-            SCBBitmapConverterRotation rotation = SCBBitmapConverterRotationNormal;
+            SCBBitmapConverterRotation rotation = [self getBitmapConverterRotation:[command valueForKey:@"rotation"]];
 
             UIFont *font = [UIFont fontWithName:fontName size:fontSize * 2];
             UIImage *image = [self imageWithString:text font:font width:width];
 
-            if ([command valueForKey:@"alignment"]){
-                SCBAlignmentPosition alignment = [self getAlignment:[command valueForKey:@"alignment"]];
-                [builder appendBitmapWithAlignment:image diffusion:NO width:width bothScale:bothScale rotation:rotation position:alignment];
+            if([command valueForKey:@"absolutePosition"]){
+                int position = ([[command valueForKey:@"absolutePosition"] intValue]) ? [[command valueForKey:@"absolutePosition"] intValue]: 40;
+                [builder appendBitmapWithAbsolutePosition:image diffusion:diffusion width:width bothScale:bothScale rotation:rotation position:position];
             }
-            else [builder appendBitmap:image diffusion:NO];
+            else if ([command valueForKey:@"alignment"]){
+                SCBAlignmentPosition alignment = [self getAlignment:[command valueForKey:@"alignment"]];
+                [builder appendBitmapWithAlignment:image diffusion:diffusion width:width bothScale:bothScale rotation:rotation position:alignment];
+            }
+            else [builder appendBitmap:image diffusion:diffusion width:width bothScale:bothScale rotation:rotation];
         }
     }
     
